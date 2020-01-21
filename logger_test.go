@@ -1,6 +1,8 @@
 package log15
 
-import "testing"
+import (
+	"testing"
+)
 
 var lvlCases = []struct {
 	in  string
