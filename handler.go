@@ -67,7 +67,7 @@ func FileHandler(path string, fmtr Format) (Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	return closingHandler{f, StreamHandler(f, fmtr)}, nil
+	return ClosingHandler{f, StreamHandler(f, fmtr)}, nil
 }
 
 // NetHandler opens a socket to the given address and writes records
@@ -78,18 +78,18 @@ func NetHandler(network, addr string, fmtr Format) (Handler, error) {
 		return nil, err
 	}
 
-	return closingHandler{conn, StreamHandler(conn, fmtr)}, nil
+	return ClosingHandler{conn, StreamHandler(conn, fmtr)}, nil
 }
 
-// XXX: closingHandler is essentially unused at the moment
-// it's meant for a future time when the Handler interface supports
-// a possible Close() operation
-type closingHandler struct {
+// ClosingHandler returns Handler that support Close() method for
+// some specify io resources: file, net.
+type ClosingHandler struct {
 	io.WriteCloser
 	Handler
 }
 
-func (h *closingHandler) Close() error {
+// Close the resource for some io resources.
+func (h *ClosingHandler) Close() error {
 	return h.WriteCloser.Close()
 }
 

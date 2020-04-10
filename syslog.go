@@ -43,7 +43,7 @@ func sharedSyslog(fmtr Format, sysWr *syslog.Writer, err error) (Handler, error)
 		s := strings.TrimSpace(string(fmtr.Format(r)))
 		return syslogFn(s)
 	})
-	return LazyHandler(&closingHandler{sysWr, h}), nil
+	return LazyHandler(&ClosingHandler{sysWr, h}), nil
 }
 
 func (m muster) SyslogHandler(priority syslog.Priority, tag string, fmtr Format) Handler {
