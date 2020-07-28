@@ -16,11 +16,11 @@ var (
 
 func init() {
 	if isatty.IsTerminal(os.Stdout.Fd()) {
-		StdoutHandler = StreamHandler(colorable.NewColorableStdout(), TerminalFormat())
+		StdoutHandler = StreamHandler(colorable.NewColorableStdout(), TerminalFormat(true))
 	}
 
 	if isatty.IsTerminal(os.Stderr.Fd()) {
-		StderrHandler = StreamHandler(colorable.NewColorableStderr(), TerminalFormat())
+		StderrHandler = StreamHandler(colorable.NewColorableStderr(), TerminalFormat(true))
 	}
 
 	root = &logger{[]interface{}{}, new(swapHandler)}

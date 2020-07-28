@@ -40,12 +40,14 @@ func (f formatFunc) Format(r *Record) []byte {
 // This format should only be used for interactive programs or while developing.
 //
 //     [TIME] [LEVEL] MESSAGE key=value key=value ...
+// Or when showDateTime is false:
+//     [LEVEL] MESSAGE key=value key=value ...
 //
 // Example:
 //
 //     [May 16 20:58:45] [DBUG] remove route ns=haproxy addr=127.0.0.1:50002
 //
-func TerminalFormat() Format {
+func TerminalFormat(showDateTime bool) Format {
 	return FormatFunc(func(r *Record) []byte {
 		var color = 0
 		switch r.Lvl {
@@ -63,10 +65,18 @@ func TerminalFormat() Format {
 
 		b := &bytes.Buffer{}
 		lvl := strings.ToUpper(r.Lvl.String())
-		if color > 0 {
-			fmt.Fprintf(b, "%s [\x1b[%dm%s\x1b[0m] %s ", r.Time.Format(termTimeFormat), color, lvl, r.Msg)
+		if showDateTime {
+			if color > 0 {
+				fmt.Fprintf(b, "%s [\x1b[%dm%s\x1b[0m] %s ", r.Time.Format(termTimeFormat), color, lvl, r.Msg)
+			} else {
+				fmt.Fprintf(b, "%s [%s] %s ", r.Time.Format(termTimeFormat), lvl, r.Msg)
+			}
 		} else {
-			fmt.Fprintf(b, "%s [%s] %s ", r.Time.Format(termTimeFormat), lvl, r.Msg)
+			if color > 0 {
+				fmt.Fprintf(b, "[\x1b[%dm%s\x1b[0m] %s ", color, lvl, r.Msg)
+			} else {
+				fmt.Fprintf(b, "[%s] %s ", lvl, r.Msg)
+			}
 		}
 
 		// try to justify the log output for short messages
